@@ -90,24 +90,33 @@ services:
       - app-network
 
   ui:
-  image: dograhai/dograh-ui:latest
-  environment:
-    BACKEND_URL: http://wt01e8vc1696jqxzuvyvk1xp.147.93.108.76.sslip.io
-    NEXTAUTH_URL: http://ggbyswsezpo5fj5n4jd4xku5.147.93.108.76.sslip.io
-    NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-    AUTH_TRUST_HOST: "true"
+    image: dograhai/dograh-ui:latest
+    environment:
+      BACKEND_URL: http://wt01e8vc1696jqxzuvyvk1xp.147.93.108.76.sslip.io
 
-    OSS_JWT_SECRET: ${OSS_JWT_SECRET}
+      NEXTAUTH_URL: http://ggbyswsezpo5fj5n4jd4xku5.147.93.108.76.sslip.io
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      AUTH_TRUST_HOST: "true"
 
-    NEXTAUTH_URL_INTERNAL: http://ui:3010
-    NEXTAUTH_DISABLE_SECURE_COOKIES: "true"
+      OSS_JWT_SECRET: ${OSS_JWT_SECRET}
 
-    NODE_ENV: development
+      NEXTAUTH_URL_INTERNAL: http://ui:3010
+      NEXTAUTH_DISABLE_SECURE_COOKIES: "true"
 
-    ENABLE_TELEMETRY: "true"
+      NODE_ENV: development
 
-  ports:
-    - "3010:3010"
+      ENABLE_TELEMETRY: "true"
+      POSTHOG_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
+      POSTHOG_HOST: "https://us.posthog.com"
+
+    depends_on:
+      api:
+        condition: service_started
+
+    ports:
+      - "3010:3010"
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
