@@ -38,11 +38,16 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
       - minio_data:/data
-    networks:
-      - app-network
     ports:
       - "9000:9000"
       - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
 
   api:
     image: dograhai/dograh-api:latest
@@ -78,10 +83,11 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
-    networks:
-      - app-network
+
     ports:
       - "8001:8000"
+    networks:
+      - app-network
 
   ui:
     image: dograhai/dograh-ui:latest
@@ -100,10 +106,11 @@ services:
     depends_on:
       api:
         condition: service_started
-    networks:
-      - app-network
+
     ports:
       - "3010:3010"
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
