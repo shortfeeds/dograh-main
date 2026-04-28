@@ -51,16 +51,30 @@ services:
 
   api:
     image: dograhai/dograh-api:latest
+    volumes:
+      - shared-tmp:/tmp
     environment:
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
       REDIS_URL: redis://:redissecret@redis:6379
 
       MINIO_ENDPOINT: minio:9000
-      MINIO_PUBLIC_ENDPOINT: http://ggbyswsezpo5fj5n4jd4xku5.147.93.108.76.sslip.io
+      MINIO_PUBLIC_ENDPOINT: http://m17my2pkfkwpejfxqqd4nn20.147.93.108.76.sslip.io
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: voice-audio
+      MINIO_SECURE: "false"
 
       OSS_JWT_SECRET: ${OSS_JWT_SECRET}
+
+      ENABLE_TELEMETRY: "true"
+      POSTHOG_API_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
+      POSTHOG_HOST: "https://us.i.posthog.com"
+
+      TURN_HOST: ${TURN_HOST}
+      TURN_SECRET: ${TURN_SECRET}
 
     depends_on:
       postgres:
@@ -70,25 +84,31 @@ services:
       minio:
         condition: service_healthy
 
-    networks:
-      - app-network
     ports:
       - "8001:8000"
+    networks:
+      - app-network
 
   ui:
     image: dograhai/dograh-ui:latest
     environment:
-      # 🔥 KEY CHANGE: USE SAME DOMAIN
-      BACKEND_URL: http://ggbyswsezpo5fj5n4jd4xku5.147.93.108.76.sslip.io
+      BACKEND_URL: http://wt01e8vc1696jqxzuvyvk1xp.147.93.108.76.sslip.io
+      BACKEND_API_ENDPOINT: http://wt01e8vc1696jqxzuvyvk1xp.147.93.108.76.sslip.io
+      API_URL: http://wt01e8vc1696jqxzuvyvk1xp.147.93.108.76.sslip.io
+      NEXT_PUBLIC_BACKEND_URL: http://wt01e8vc1696jqxzuvyvk1xp.147.93.108.76.sslip.io
+      NEXT_PUBLIC_API_URL: http://wt01e8vc1696jqxzuvyvk1xp.147.93.108.76.sslip.io
 
       NEXTAUTH_URL: http://ggbyswsezpo5fj5n4jd4xku5.147.93.108.76.sslip.io
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       AUTH_TRUST_HOST: "true"
+      NEXTAUTH_DISABLE_SECURE_COOKIES: "true"
 
       OSS_JWT_SECRET: ${OSS_JWT_SECRET}
 
-      NEXTAUTH_DISABLE_SECURE_COOKIES: "true"
       NODE_ENV: development
+      ENABLE_TELEMETRY: "true"
+      POSTHOG_KEY: "phc_ItizB1dP6yv7ZYobbcqrpxTdbomDA8hJFSEmAMdYvIr"
+      POSTHOG_HOST: "https://us.posthog.com"
 
     depends_on:
       api:
@@ -96,7 +116,6 @@ services:
 
     ports:
       - "3010:3010"
-
     networks:
       - app-network
 
@@ -104,6 +123,7 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
+  shared-tmp:
 
 networks:
   app-network:
